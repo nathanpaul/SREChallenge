@@ -24,13 +24,18 @@ begin
   })
   #WAIT
   puts "instantiating waiter and waiting for stack creation completion. With cloudfront, this will take a while"
-  Aws::CloudFormation::Waiters::StackExists.wait({
+  waiter = Aws::CloudFormation::Waiters::StackCreateComplete.new({
+    client: cf,
+    max_attempts: 20000,
+    delay: 60
+  })
+  waiter.wait({
     stack_name: "my-stack"
   })
   puts "done with stack creation!"
-  pry
 rescue
-  puts "created stack already"
+  puts "created stack already, or something went wrong"
+  pry
 end
 
 # once done, upload to root bucket with the index.html file.

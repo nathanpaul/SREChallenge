@@ -67,10 +67,9 @@ Resources:
         Enabled: true
         HttpVersion: 'http2'
         DefaultRootObject: index.html
-        Aliases:
-          - !Ref RootDomainName
-          - www.${Domain}
-          - Domain: !Ref RootDomainName 
+        Aliases: 
+        - !Ref RootDomainName
+        - www.${!Ref RootDomainName}
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
