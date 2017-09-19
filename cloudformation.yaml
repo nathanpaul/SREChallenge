@@ -58,7 +58,7 @@ Resources:
       DistributionConfig:
         Comment: CloudFront pointing to the S3 bucket
         Origins:
-          - DomainName: !GetAtt WWWBucket.DomainName
+          - DomainName: !GetAtt RootBucket.DomainName
             Id: S3Origin
             CustomOriginConfig:
               HTTPPort: '80'
@@ -68,7 +68,7 @@ Resources:
         HttpVersion: 'http2'
         DefaultRootObject: index.html
         Aliases:
-          - !GetAtt RootBucket.DomainName 
+          - !Ref RootDomainName
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
