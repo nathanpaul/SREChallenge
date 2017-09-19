@@ -50,11 +50,11 @@ client.put_object({
   key: index_file_name,
   body: index_file
 })
-client.put_bucket_acl({
-  acl: "public-read",
+policy = File.read("bucket_policy.json")
+resp = client.put_bucket_policy({
   bucket: domain_name,
+  policy: policy
 })
-# test that it's working with Net HTTP
 begin
   uri = URI.parse("https://" + domain_name)
   http = Net::HTTP.new(uri.host, uri.port)
