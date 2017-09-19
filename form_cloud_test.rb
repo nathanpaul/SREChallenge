@@ -36,8 +36,7 @@ begin
   })
   puts "done with stack creation!"
 rescue
-  puts "created stack already, or something went wrong"
-  pry
+  puts "created stack already"
 end
 
 # once done, upload to root bucket with the index.html file.
