@@ -58,7 +58,7 @@ Resources:
       DistributionConfig:
         Comment: CloudFront pointing to the S3 bucket
         Origins:
-          - DomainName: !Join [., [!GetAtt WWWBucket.DomainName, !FindInMap [RegionMap, !Ref 'AWS::Region', websiteendpoint]]]
+          - DomainName: !GetAtt WWWBucket.DomainName
             Id: S3Origin
             CustomOriginConfig:
               HTTPPort: '80'
@@ -68,7 +68,7 @@ Resources:
         HttpVersion: 'http2'
         DefaultRootObject: index.html
         Aliases:
-          - !GetAtt WWWBucket.DomainName
+          - !GetAtt RootBucket.DomainName 
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
@@ -105,7 +105,7 @@ Resources:
         Type: CNAME
         TTL: 900
         ResourceRecords:
-        - !GetAtt WWWBucket.DomainName
+        - !GetAtt myCloudFront.DomainName
 Outputs:
   WebsiteURL:
     Value: !GetAtt RootBucket.WebsiteURL
