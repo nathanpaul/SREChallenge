@@ -54,35 +54,35 @@ Resources:
     Type: AWS::CloudFront::Distribution
     DependsOn:
       - WWWBucket
-      Properties:
-        DistributionConfig:
-          Comment: CloudFront pointing to the S3 bucket
-          Origins:
-            - DomainName: !Join [., [!GetAtt WWWBucket.BucketName, !FindInMap [RegionMap, !Ref 'AWS::Region', websiteendpoint]]]
-              Id: S3Origin
+    Properties:
+      DistributionConfig:
+        Comment: CloudFront pointing to the S3 bucket
+        Origins:
+          - DomainName: !Join [., [!GetAtt WWWBucket.DomainName, !FindInMap [RegionMap, !Ref 'AWS::Region', websiteendpoint]]]
+            Id: S3Origin
             CustomOriginConfig:
               HTTPPort: '80'
               HTTPSPort: '443'
               OriginProtocolPolicy: http-only
-          Enabled: true
-          HttpVersion: 'http2'
-          DefaultRootObject: index.html
-          Aliases:
-            - !GetAtt WWWBucket.BucketName
-          DefaultCacheBehavior:
-            AllowedMethods:
-              - GET
-              - HEAD
-            Compress: true
-            TargetOriginId: S3Origin
-            ForwardedValues:
-              QueryString: true
-              Cookies:
-                Forward: none
-              ViewerProtocolPolicy: redirect-to-https
-              ViewerCertificate:
-                AcmCertificateArn: !Ref CertificateARN
-                SslSupportMethod: sni-only
+        Enabled: true
+        HttpVersion: 'http2'
+        DefaultRootObject: index.html
+        Aliases:
+          - !GetAtt WWWBucket.DomainName
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+            ViewerCertificate:
+              AcmCertificateArn: !Ref CertificateARN
+              SslSupportMethod: sni-only
   myDNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:
