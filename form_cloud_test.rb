@@ -1,6 +1,8 @@
 require 'aws-sdk'
 require 'yaml'
 require 'pry'
+require "net/https"
+require "uri"
 
 keys = YAML.load_file('secret_keys.yaml')
 ENV['AWS_ACCESS_KEY_ID'] = keys['aws']['access_key']
@@ -30,13 +32,29 @@ puts "uploading file"
 index_file_name = "index.html"
 index_file = File.read("index.html")
 client = Aws::S3::Client.new
-client.put_bucket_acl({
-  acl: "public-read",
-  bucket: domain_name,
-})
 client.put_object({
   bucket: domain_name,
   key: index_file_name,
   body: index_file
 })
-# test that it's working with Net URI
+client.put_bucket_acl({
+  acl: "public-read",
+  bucket: domain_name,
+})
+# test that it's working with Net HTTP
+begin
+  uri = URI.parse("https://" + domain_name)
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  req = Net::HTTP::Get.new(uri.request_uri)
+  puts "sending response"
+  response = http.request(req)
+  if response.body.eql? index_file
+    puts "done!"
+  else
+    puts "oops"
+  end
+rescue
+  puts "Server not configured correctly"
+  pry
+end
