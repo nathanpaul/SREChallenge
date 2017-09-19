@@ -49,7 +49,7 @@ client.put_object({
   key: index_file_name,
   body: index_file
 })
-policy = File.read("bucket_policy.json")
+policy = File.read("bucket_policy.json").gsub! "BUCKET", domain_name
 resp = client.put_bucket_policy({
   bucket: domain_name,
   policy: policy
