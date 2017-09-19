@@ -23,9 +23,11 @@ begin
       { parameter_key: 'RootDomainName', parameter_value: domain_name} ]
   })
   #WAIT
+  puts "instantiating waiter and waiting for stack creation completion. With cloudfront, this will take a while"
   Aws::CloudFormation::Waiters::StackExists.wait({
     stack_name: "my-stack"
   })
+  puts "done with stack creation!"
   pry
 rescue
   puts "created stack already"
@@ -54,11 +56,12 @@ begin
   puts "sending response"
   response = http.request(req)
   if response.body.eql? index_file
-    puts "done!"
+    puts "Test complete! HTTPs works and the file requested from the domain name matches the index.html file"
   else
-    puts "oops"
+    puts "oops, something went wrong."
+    pry
   end
 rescue
-  puts "Server not configured correctly"
+  puts "Server not configured correctly, or some other error happened"
   pry
 end
