@@ -10,7 +10,6 @@ ENV['AWS_REGION'] = 'us-east-1'
 file = File.read('cloudformation.yaml')
 
 cf = Aws::CloudFormation::Client.new(validate_params: false)
-{CertificateARN: keys['aws']['certificate_arn'], RootDomainName: keys['aws']['domain_name']}
 stack = cf.create_stack({
     stack_name: "my-stack",
     template_body: file,
