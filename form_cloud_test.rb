@@ -23,6 +23,10 @@ begin
       { parameter_key: 'RootDomainName', parameter_value: domain_name} ]
   })
   #WAIT
+  Aws::CloudFormation::Waiters::StackExists.wait({
+    stack_name: "my-stack"
+  })
+  pry
 rescue
   puts "created stack already"
 end
