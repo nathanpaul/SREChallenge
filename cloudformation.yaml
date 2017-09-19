@@ -1,7 +1,10 @@
 Parameters:
   RootDomainName:
-    Description: Domain name for your website (example.com)
+    Description: Domain name for your website (definitelyillic.it or beardgrowthforlife.com)
     Type: String
+  CertificateARN:
+    Type: String
+    Description: ARN of an certificate manager certificate.
 Mappings:
   RegionMap:
     us-east-1:
@@ -36,7 +39,7 @@ Resources:
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
-        ErrorDocument: 404.html
+        ErrorDocument: error.html
   WWWBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -47,20 +50,53 @@ Resources:
       WebsiteConfiguration:
         RedirectAllRequestsTo:
           HostName: !Ref RootBucket
+  myCloudFront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - WWWBucket
+      Properties:
+        DistributionConfig:
+          Comment: CloudFront pointing to the S3 bucket
+          Origins:
+            - DomainName: !Join [., [!GetAtt WWWBucket.BucketName, !FindInMap [RegionMap, !Ref 'AWS::Region', websiteendpoint]]]
+              Id: S3Origin
+            CustomOriginConfig:
+              HTTPPort: '80'
+              HTTPSPort: '443'
+              OriginProtocolPolicy: http-only
+          Enabled: true
+          HttpVersion: 'http2'
+          DefaultRootObject: index.html
+          Aliases:
+            - !GetAtt WWWBucket.BucketName
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            TargetOriginId: S3Origin
+            ForwardedValues:
+              QueryString: true
+              Cookies:
+                Forward: none
+              ViewerProtocolPolicy: redirect-to-https
+              ViewerCertificate:
+                AcmCertificateArn: !Ref CertificateARN
+                SslSupportMethod: sni-only
   myDNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: !Sub 
+      HostedZoneName: !Sub
           - ${Domain}.
           - Domain: !Ref RootDomainName
       Comment: Zone apex alias.
       RecordSets:
-      - 
+      -
         Name: !Ref RootDomainName
         Type: A
         AliasTarget:
           HostedZoneId: !FindInMap [ RegionMap, !Ref 'AWS::Region', S3hostedzoneID]
-          DNSName: !FindInMap [ RegionMap, !Ref 'AWS::Region', websiteendpoint]
+          DNSName: !GetAtt myCloudFront.DomainName
       -
         Name: !Sub
             - www.${Domain}
