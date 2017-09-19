@@ -13,14 +13,16 @@ file = File.read('cloudformation.yaml')
 
 cf = Aws::CloudFormation::Client.new(validate_params: false)
 domain_name = keys['aws']['domain_name']
+wwwname = "www." + domain_name
 begin
   puts "creating stack"
   stack = cf.create_stack({
       stack_name: "my-stack",
       template_body: file,
       parameters: [
-      { parameter_key: 'CertificateARN', parameter_value: keys['aws']['certificate_arn'] },
-      { parameter_key: 'RootDomainName', parameter_value: domain_name} ]
+      { parameter_key: 'CertificateARN', parameter_value: keys['aws']['certificate_arn']},
+      { parameter_key: 'RootDomainName', parameter_value: domain_name},
+      { parameter_key: 'WWWName',        parameter_value: wwwname}]
   })
   #WAIT
   puts "instantiating waiter and waiting for stack creation completion. With cloudfront, this will take a while"

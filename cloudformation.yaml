@@ -4,7 +4,10 @@ Parameters:
     Type: String
   CertificateARN:
     Type: String
-    Description: ARN of an certificate manager certificate.
+    Description: ARN of an certificate manager certificate
+  WWWName:
+    Type: String
+    Description: Non-concat of RootDomainName
 Mappings:
   RegionMap:
     us-east-1:
@@ -67,9 +70,9 @@ Resources:
         Enabled: true
         HttpVersion: 'http2'
         DefaultRootObject: index.html
-        Aliases: 
+        Aliases:
         - !Ref RootDomainName
-        - www.${!Ref RootDomainName}
+        - !Ref WWWName
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
